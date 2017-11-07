@@ -5,7 +5,7 @@ INCLUDE "constants.asm"
 SECTION "Text", ROM0
 
 GOLFName::
-	dstr "Gen One Save File               ", "      editor"
+	dstr "Gen One Link File               ", "      editor"
 	
 	
 WaitHandshakeStr::
