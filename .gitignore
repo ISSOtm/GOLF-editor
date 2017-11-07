@@ -1,0 +1,14 @@
+*.o
+*.gbc
+*.sym
+*.map
+*.sgm
+*.srm
+*.sav
+*.rtc
+TODO.txt
+*.tmp
+*.state
+*.ls*
+*.time
+*.clk
