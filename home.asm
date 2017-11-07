@@ -142,7 +142,7 @@ MainLoop::
 	and a
 	jr z, .waitMenuSelection
 	ldh a, [hSerialOutput]
-	cp $D0
+	cp $D4
 	jr nz, .tryMenuSelection
 	ldh [hSerialInput], a
 	
