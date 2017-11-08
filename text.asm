@@ -14,5 +14,11 @@ WaitHandshakeStr::
 SelectTradeStr::
 	dstr "Select trade."
 	
+SendingPayloadStr::
+	dstr "Sending payload"
+	
+DoingMagicStr::
+	dstr "Doing RCE magic..."
+	
 OKStr::
 	dstr "  OK"

@@ -42,7 +42,6 @@ ENDR
 	
 	
 SerialHandler::
-	ld a, [rSB]
 	ldh [hSerialOutput], a
 	ldh a, [hSerialInput]
 	ld [rSB], a
@@ -51,7 +50,10 @@ SerialHandler::
 	
 	ldh a, [hSerialMode]
 	and a
-	ret nz
+	jr nz, .done
 	ld a, $80
 	ld [rSC], a
-	ret
+.done
+	pop hl
+	pop af
+	reti

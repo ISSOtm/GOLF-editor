@@ -134,6 +134,12 @@ MainLoop::
 	ld de, $98C1
 	call CopyStrToVRAM
 	
+.waitInMenu
+	ldh a, [hSerialOutput]
+	cp $D0
+	jr nz, .waitInMenu
+	; ld a, $D0
+	ldh [hSerialInput], a
 .tryMenuSelection
 	xor a
 	ldh [hSerialRecieved], a
@@ -151,9 +157,89 @@ MainLoop::
 	call CopyStrToVRAM
 	
 	; We're now in the Cable Club !
+	
+	; Ignore the first few bytes of data, they are syncing stuff.
+	call Serial_SyncAndExchangeNybble
+	
+	ld a, $60
+	ldh [hSerialInput], a
+	ld bc, $11
+	call Serial_IgnoreBCBytes
+	
+	
+	ld hl, SendingPayloadStr
+	ld de, $98E1
+	call CopyStrToVRAM
+	
+	ld hl, PayloadParty
+	ld bc, $1A8
+	call Serial_SendBytes
+	
+	ld hl, PayloadPatchList
+	ld bc, $C8
+	call Serial_SendBytes
+	
+	ld hl, OKStr + 1
+	ld de, $98F0
+	call CopyStrToVRAM
+	
+	ld hl, DoingMagicStr
+	ld de, $9901
+	call CopyStrToVRAM
+	
+.tryWaitForRCE
+	xor a
+	ldh [hSerialRecieved], a
+.waitForRCE
+	ldh a, [hSerialRecieved]
+	and a
+	jr z, .waitForRCE
+	ldh a, [hSerialOutput]
+	cp $2A
+	jr nz, .tryWaitForRCE
+	
+	ld hl, OKStr + 1
+	ld de, $9910
+	call CopyStrToVRAM
+	
 	jr @
 	
 	
+	
+PatchList		equ $C5D0
+	
+SerialRecieved	equ $FFA9
+SerialClockMode	equ $FFAA
+SerialDataIn	equ $FFAB
+SerialDataOut	equ $FFAC
+	
+PayloadParty::
+	dbfill 3, 0
+.actualCode
+	ld a, $2A
+	ld [rSB], a
+	jp PatchList + 2 ; Skip over 2 terminating bytes
+	
+	db 1 ; Party size
+	; Party data
+	dbfill 356, $E3
+	db $CE, $FF
+	dbfill $31, 0
+	db $FF
+	
+PayloadPatchList:: ; Located at $C5D0 in the opponent's side
+	db $FF, $FF
+	ld a, $81
+	ld [rSC], a
+	xor a
+	ldh [SerialRecieved], a
+	inc a
+	ldh [SerialClockMode], a ; Switch to ext clock
+.lock
+	dec b
+	jr .lock
+	dbfill $B9, 0
+	
+	
 INCLUDE "home/handlers.asm"
-INCLUDE "home/utilities2.asm"
 

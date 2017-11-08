@@ -33,10 +33,9 @@ DelayBCFrames::
 Serial_int::
 	push af
 	push hl
-	call SerialHandler
-	pop hl
-	pop af
-	reti
+	ld a, [rSB]
+	jp SerialHandler
+	nop
 	
 ; Joypad
 Joypad_int::
